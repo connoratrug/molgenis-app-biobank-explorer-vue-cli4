@@ -1,29 +1,38 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
-import Home from '../views/Home.vue'
+import BiobankExplorerContainer from '../components/BiobankExplorerContainer'
+import BiobankReportCard from '../components/cards/BiobankReportCard'
+import CollectionReportCard from '../components/cards/CollectionReportCard'
+import NetworkReportCard from '../components/cards/NetworkReportCard'
+import { INITIAL_STATE } from '../store/state'
 
 Vue.use(VueRouter)
-
-const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: Home
-  },
-  {
-    path: '/about',
-    name: 'About',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import(/* webpackChunkName: "about" */ '../views/About.vue')
-  }
-]
-
-const router = new VueRouter({
+export default new VueRouter({
   mode: 'history',
-  base: process.env.BASE_URL,
-  routes
+  base: INITIAL_STATE.baseUrl,
+  routes: [
+    {
+      path: '/',
+      component: BiobankExplorerContainer
+    },
+    {
+      path: '/biobank/report/:id',
+      redirect: '/biobank/:id'
+    },
+    {
+      path: '/biobank/:id',
+      name: 'biobank',
+      component: BiobankReportCard
+    },
+    {
+      path: '/collection/:id',
+      name: 'collection',
+      component: CollectionReportCard
+    },
+    {
+      path: '/network/:id',
+      name: 'network',
+      component: NetworkReportCard
+    }
+  ]
 })
-
-export default router
