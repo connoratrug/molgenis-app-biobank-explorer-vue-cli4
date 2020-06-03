@@ -1,7 +1,11 @@
-/* global describe it expect beforeEach */
-import { shallowMount } from '@vue/test-utils'
+
+import { expect } from 'chai'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import BiobankReportCard from '@/components/cards/BiobankReportCard'
+
+const localVue = createLocalVue()
+localVue.use(Vuex)
 
 describe('BiobankReportCard', () => {
   let store
@@ -53,20 +57,20 @@ describe('BiobankReportCard', () => {
   })
 
   it('should initialize component', () => {
-    const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+    const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
     expect(wrapper.html()).to.have.string('class="mg-biobank-card container"')
   })
 
   describe('computed', () => {
     describe('query', () => {
       it('should get query', () => {
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.query).to.equal('some-query')
       })
 
       it('should expose a list of covid19 types if available', () => {
         biobankReport.covid19biobank = [{ label: 'Member of the COVID-19 network' }, { name: 'COVID-19' }]
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.availableCovidTypes).to.deep.equal({
           Covid19: {
             badgeColor: 'warning',
@@ -82,39 +86,39 @@ describe('BiobankReportCard', () => {
 
     describe('collectionsData', () => {
       it('should fill collectionsData if available', () => {
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.collectionsData).to.deep.equal([])
       })
 
       it('should return empty array', () => {
         store.state.biobankReport = undefined
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.collectionsData).to.deep.equal([])
       })
     })
 
     describe('contact', () => {
       it('should fill contact', () => {
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.contact.email).to.deep.equal({ value: 'email', type: 'email' })
       })
 
       it('should return empty object', () => {
         store.state.biobankReport = undefined
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.contact).to.deep.equal({})
       })
     })
 
     describe('networks', () => {
       it('should fill networks', () => {
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.networks.length).to.equal(2)
       })
 
       it('should return empty array', () => {
         store.state.biobankReport = undefined
-        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(BiobankReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.networks).to.deep.equal([])
       })
     })

@@ -1,5 +1,11 @@
-import { shallowMount } from '@vue/test-utils'
+
+import { expect } from 'chai'
+import { mount, createLocalVue } from '@vue/test-utils'
 import SubCollectionsTable from '@/components/tables/SubCollectionsTable'
+import BootstrapVue from 'bootstrap-vue'
+
+const localVue = createLocalVue()
+localVue.use(BootstrapVue)
 
 describe('SubCollectionsTable', () => {
   let stubs
@@ -80,7 +86,7 @@ describe('SubCollectionsTable', () => {
       }
     }
     stubs = ['router-link']
-    wrapper = shallowMount(SubCollectionsTable, { propsData: { subCollections }, stubs, mocks })
+    wrapper = mount(SubCollectionsTable, { propsData: { subCollections }, stubs, mocks, localVue })
   })
   describe('methods', () => {
     describe('getCollectionMaterials', () => {

@@ -1,7 +1,11 @@
-/* global describe it expect beforeEach */
-import { shallowMount } from '@vue/test-utils'
+
+import { expect } from 'chai'
+import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import CollectionReportCard from '@/components/cards/CollectionReportCard'
+
+const localVue = createLocalVue()
+localVue.use(Vuex)
 
 describe('CollectionReportCard', () => {
   let store
@@ -65,7 +69,7 @@ describe('CollectionReportCard', () => {
   })
 
   it('should initialize component', () => {
-    const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+    const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
     expect(wrapper.html()).to.have.string('class="container mg-collection-report-card"')
   })
 
@@ -73,7 +77,7 @@ describe('CollectionReportCard', () => {
     describe('rightCardContent', () => {
       it('should return empty object', () => {
         store.state.collectionReport = undefined
-        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.rightCardContent).to.deep.equal({})
       })
     })
@@ -81,21 +85,21 @@ describe('CollectionReportCard', () => {
     describe('mainContent', () => {
       it('should return empty object', () => {
         store.state.collectionReport = undefined
-        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.mainContent).to.deep.equal({})
       })
     })
 
     describe('collectionId', () => {
       it('computes the collection id based on URL', () => {
-        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.collectionId).to.equal('c-001')
       })
     })
 
     describe('subCollections', () => {
       it('computes empty array for empty subCollections', () => {
-        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
         expect(wrapper.vm.subCollections).to.deep.equal([])
       })
       it('computes array with subCollections', () => {
@@ -120,7 +124,7 @@ describe('CollectionReportCard', () => {
           }
         ]
 
-        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store })
+        const wrapper = shallowMount(CollectionReportCard, { mocks, stubs, store, localVue })
         const expected = [
           {
             description: undefined,

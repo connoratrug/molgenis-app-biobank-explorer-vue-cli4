@@ -1,4 +1,5 @@
-/* global describe it expect */
+
+import { expect } from 'chai'
 import FilterContainer from '@/components/filters/FilterContainer'
 import Vuex from 'vuex'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
@@ -74,7 +75,7 @@ describe('FilterContainer', () => {
           getCovid19Options: () => []
         }
       })
-      wrapper = shallowMount(FilterContainer, { store })
+      wrapper = shallowMount(FilterContainer, { store, localVue })
       expect(wrapper.vm.filters.length).eq(6)
       expect(wrapper.vm.filters.find((filter) => filter.name === 'country').name).eq('country')
     })
@@ -142,7 +143,7 @@ describe('FilterContainer', () => {
           getCovid19Options: () => []
         }
       })
-      wrapper = shallowMount(FilterContainer, { store })
+      wrapper = shallowMount(FilterContainer, { store, localVue })
       expect(wrapper.vm.filters.length).eq(5)
       expect(wrapper.vm.filters.find((filter) => filter.name === 'country')).eq(undefined)
     })

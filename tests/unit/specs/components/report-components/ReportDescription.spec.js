@@ -1,4 +1,5 @@
-/* global describe it expect beforeEach */
+
+import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
 import ReportDescription from '@/components/report-components/ReportDescription'
 
@@ -10,7 +11,7 @@ describe('ReportDescription', () => {
 
   it('should not initialize component without description', () => {
     const wrapper = shallowMount(ReportDescription)
-    expect(undefined).to.equal(wrapper.html())
+    expect(wrapper.html()).to.equal('')
   })
 
   describe('methods', () => {
