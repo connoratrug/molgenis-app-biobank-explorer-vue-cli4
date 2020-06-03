@@ -1,4 +1,5 @@
-/* global describe it expect beforeEach */
+
+import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
 import ReportTitle from '@/components/report-components/ReportTitle'
 

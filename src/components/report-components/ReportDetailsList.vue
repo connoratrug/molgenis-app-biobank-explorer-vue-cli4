@@ -3,7 +3,9 @@
     <caption v-show="false">
       Details list
     </caption>
+    <!-- eslint-disable -->
     <tr v-for="(value, key) in reportDetails" v-if="showRow(value)" :key="key">
+    <!-- eslint-enable -->
       <!-- Header -->
       <th scope="row" class="pr-1" v-if="showKey(value.type)">{{ key }}:</th>
 

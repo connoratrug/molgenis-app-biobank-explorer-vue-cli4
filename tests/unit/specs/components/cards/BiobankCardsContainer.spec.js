@@ -1,4 +1,4 @@
-/* global describe it expect beforeEach */
+import { expect } from 'chai'
 import { shallowMount, createLocalVue } from '@vue/test-utils'
 import Vuex from 'vuex'
 import BiobankCardsContainer from '@/components/cards/BiobankCardsContainer'
@@ -18,24 +18,25 @@ describe('BiobankCardsContainer', () => {
       getters: {
         biobanks: () => biobanks,
         loading: () => true,
-        getActiveFilters: () => activeFilters
+        getActiveFilters: () => activeFilters,
+        foundBiobanks: () => biobanks
       }
     })
   })
 
   it('should initialize component', () => {
-    const wrapper = shallowMount(BiobankCardsContainer, { store })
+    const wrapper = shallowMount(BiobankCardsContainer, { store, localVue })
     expect(wrapper.html()).to.have.string('<div class="biobank-cards-container">')
   })
 
   it('should return "true" for isAnyFilterActive if filters are active', () => {
-    const wrapper = shallowMount(BiobankCardsContainer, { store })
+    const wrapper = shallowMount(BiobankCardsContainer, { store, localVue })
     expect(wrapper.vm.isAnyFilterActive).to.equal(true)
   })
 
   it('should return "false" for isAnyFilterActive if no filters are active', () => {
     activeFilters = {}
-    const wrapper = shallowMount(BiobankCardsContainer, { store })
+    const wrapper = shallowMount(BiobankCardsContainer, { store, localVue })
     expect(wrapper.vm.isAnyFilterActive).to.equal(false)
   })
 
@@ -47,7 +48,8 @@ describe('BiobankCardsContainer', () => {
         biobanks () {
           return biobanks
         }
-      }
+      },
+      localVue
     })
     wrapper.setData({ currentPage: 5 })
     expect(wrapper.vm.currentPage).to.equal(5)

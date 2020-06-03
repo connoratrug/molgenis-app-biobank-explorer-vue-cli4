@@ -1,4 +1,4 @@
-/* global describe it expect beforeEach */
+import { expect } from 'chai'
 import { shallowMount } from '@vue/test-utils'
 import BiobankCard from '@/components/cards/BiobankCard'
 
@@ -19,7 +19,7 @@ describe('BiobankCard', () => {
         }]
       }
     }
-    stubs = ['router-link', 'router-view']
+    stubs = ['router-link', 'router-view', 'b-img']
   })
 
   it('should initialize the collapsed prop to true if none is passed', () => {

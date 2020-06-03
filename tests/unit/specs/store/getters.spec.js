@@ -1,3 +1,4 @@
+
 import { expect } from 'chai'
 import getters from '../../../../src/store/getters'
 

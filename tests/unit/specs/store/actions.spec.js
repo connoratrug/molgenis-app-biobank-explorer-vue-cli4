@@ -1,41 +1,46 @@
+
+import chai, { expect } from 'chai'
+import sinon from 'sinon'
+import sinonChai from 'sinon-chai'
 import td from 'testdouble'
 import api from '@molgenis/molgenis-api-client'
 import actions, {
-  GET_BIOBANKS,
-  GET_COLLECTION_QUALITY_COLLECTIONS,
   GET_DATA_TYPE_OPTIONS,
   GET_TYPES_OPTIONS,
+  GET_BIOBANKS,
   SEND_TO_NEGOTIATOR,
-  GET_BIOBANK_IDS,
-  GET_COLLECTION_IDS
-} from '../../../../src/store/actions'
+  GET_COLLECTION_QUALITY_COLLECTIONS
+}
+  from '../../../../src/store/actions'
 import utils from '@molgenis/molgenis-vue-test-utils'
 import {
-  MAP_QUERY_TO_STATE,
-  SET_BIOBANKS,
-  SET_BIOBANK_IDS,
-  SET_BIOBANK_REPORT,
-  SET_COLLECTION_REPORT,
   SET_COLLECTION_QUALITY,
   SET_COLLECTION_TYPES,
   SET_COUNTRIES,
   SET_DATA_TYPES,
   SET_DIAGNOSIS_AVAILABLE,
-  SET_ERROR,
-  SET_LOADING,
-  SET_NETWORK_REPORT,
   SET_MATERIALS,
-  SET_COLLECTION_QUALITY_COLLECTIONS,
-  SET_BIOBANK_QUALITY_BIOBANKS,
   SET_BIOBANK_QUALITY,
+  SET_COVID_19,
+  SET_LOADING,
+  SET_BIOBANK_REPORT,
+  SET_BIOBANK_QUALITY_BIOBANKS,
   SET_NETWORK_BIOBANKS,
   SET_NETWORK_COLLECTIONS,
-  SET_COVID_19,
-  SET_COLLECTION_IDS
+  SET_NETWORK_REPORT,
+  SET_COLLECTION_REPORT,
+  SET_COLLECTION_QUALITY_COLLECTIONS,
+  SET_BIOBANKS,
+  SET_ERROR,
+  SET_COLLECTION_IDS,
+  MAP_QUERY_TO_STATE,
+  SET_BIOBANK_IDS
 } from '../../../../src/store/mutations'
 import helpers from '../../../../src/store/helpers'
 
-describe.only('store', () => {
+chai.use(sinonChai)
+
+describe('store', () => {
   describe('actions', () => {
     afterEach(() => td.reset())
 
@@ -272,25 +277,33 @@ describe.only('store', () => {
 
     describe('GET_QUERY', () => {
       it('should commit GET_QUERY mutation when no diagnosis ids are in the URL', done => {
+        const response = { items: [{ code: 'L40' }] }
+        const get = td.function('api.get')
+
+        td.when(get('/api/v2/eu_bbmri_eric_disease_types?q=code=in=(C18,L40)')).thenResolve(response)
+        td.replace(api, 'get', get)
+
         const state = {
           route: {
             query: {
-              country: 'NL,BE'
+              country: 'NL,BE',
+              diagnosis_available: 'C18,L40'
             }
           }
         }
 
-        const options = {
-          state: state,
-          expectedMutations: [
-            { type: MAP_QUERY_TO_STATE }
-          ]
-        }
+        const commit = sinon.spy()
+        const dispatch = sinon.spy()
 
-        utils.testAction(actions.__GET_QUERY__, options, done)
+        actions.__GET_QUERY__({ state, dispatch, commit })
+
+        setTimeout(function () {
+          sinon.assert.calledWithMatch(commit, MAP_QUERY_TO_STATE, { diagnoses: [{ code: 'L40' }] })
+          done()
+        }, 300)
       })
 
-      it('should fetch diagnoses from the server and map result + URL query to state', done => {
+      it('should fetch diagnoses from the server and map result + URL query to state', () => {
         const state = {
           route: {
             query: {
@@ -301,7 +314,6 @@ describe.only('store', () => {
 
         const response = {
           items: [
-            { code: 'C18' },
             { code: 'L40' }
           ]
         }
@@ -310,17 +322,14 @@ describe.only('store', () => {
         td.when(get('/api/v2/eu_bbmri_eric_disease_types?q=code=in=(C18,L40)')).thenResolve(response)
         td.replace(api, 'get', get)
 
-        const options = {
-          state: state,
-          expectedMutations: [
-            { type: MAP_QUERY_TO_STATE, payload: response.items }
-          ]
-        }
+        const commit = sinon.spy()
+        const dispatch = sinon.spy()
 
-        utils.testAction(actions.__GET_QUERY__, options, done)
+        actions.__GET_QUERY__({ state, dispatch, commit })
+        expect(commit).to.have.been.calledWith(MAP_QUERY_TO_STATE)
       })
 
-      it('should trigger the action to get the collections matching the applied quality standards and map result + URL query to state', done => {
+      it('should trigger the action to get the collections matching the applied quality standards and map result + URL query to state', () => {
         const state = {
           route: {
             query: {
@@ -328,22 +337,18 @@ describe.only('store', () => {
             }
           }
         }
-        const options = {
-          state: state,
-          expectedActions: [
-            { type: GET_COLLECTION_QUALITY_COLLECTIONS }
-          ],
-          expectedMutations: [
-            { type: MAP_QUERY_TO_STATE }
-          ]
-        }
 
-        utils.testAction(actions.__GET_QUERY__, options, done)
+        const commit = sinon.spy()
+        const dispatch = sinon.spy()
+
+        actions.__GET_QUERY__({ state, dispatch, commit })
+        expect(dispatch).to.have.been.calledWith(GET_COLLECTION_QUALITY_COLLECTIONS)
+        expect(commit).to.have.been.calledWith(MAP_QUERY_TO_STATE)
       })
     })
 
     describe('GET_BIOBANKS', () => {
-      it('should retrieve biobanks from the server and store them in state', done => {
+      it('should retrieve biobanks from the server and store them in state', (done) => {
         const response = {
           items: [
             { id: '1', name: 'biobank-1' },
@@ -357,10 +362,10 @@ describe.only('store', () => {
         td.replace(api, 'get', get)
 
         const options = {
+          payload: ['id1', 'id2'],
           expectedMutations: [
             { type: SET_BIOBANKS, payload: response.items }
-          ],
-          payload: ['id1', 'id2']
+          ]
         }
 
         utils.testAction(actions[GET_BIOBANKS], options, done)
@@ -419,7 +424,7 @@ describe.only('store', () => {
         })
       })
 
-      it('should commit the error if the server response was bad', (done) => {
+      it('should commit the error if the server response was bad', done => {
         const post = td.function('api.post')
         const getLocationHref = td.function('getLocationHref')
         td.replace(api, 'post', post)
@@ -452,14 +457,15 @@ describe.only('store', () => {
           .thenResolve(response)
         td.replace(api, 'get', get)
 
-        const options = {
-          getters: { biobankRsql: 'covid19=in=(covid19)' },
-          expectedMutations: [
-            { type: SET_BIOBANK_IDS, payload: ['biobank-1', 'biobank-2'] }
-          ]
-        }
+        const getters = { biobankRsql: 'covid19=in=(covid19)' }
+        const commit = sinon.spy()
 
-        utils.testAction(actions[GET_BIOBANK_IDS], options, done)
+        actions.__GET_BIOBANK_IDS__({ commit, getters })
+
+        setTimeout(function () {
+          sinon.assert.calledWithMatch(commit.secondCall, SET_BIOBANK_IDS, ['biobank-1', 'biobank-2'])
+          done()
+        }, 300)
       })
     })
 
@@ -477,17 +483,16 @@ describe.only('store', () => {
           .thenResolve(response)
         td.replace(api, 'get', get)
 
-        const options = {
-          getters: { rsql: 'country=in=(NL,BE)' },
-          expectedMutations: [{
-            type: SET_COLLECTION_IDS,
-            payload: [
-              { biobankId: 'b1', collectionId: 'c1' },
-              { biobankId: 'b2', collectionId: 'c2' }]
-          }]
-        }
+        const getters = { rsql: 'country=in=(NL,BE)' }
+        const commit = sinon.spy()
 
-        utils.testAction(actions[GET_COLLECTION_IDS], options, done)
+        actions.__GET_COLLECTION_IDS__({ commit, getters })
+
+        setTimeout(function () {
+          sinon.assert.calledWithMatch(commit.secondCall, SET_COLLECTION_IDS, [{ biobankId: 'b1', collectionId: 'c1' },
+            { biobankId: 'b2', collectionId: 'c2' }])
+          done()
+        }, 300)
       })
 
       it('should retrieve all collection and biobank ids if there is no collection filter', done => {
@@ -496,17 +501,16 @@ describe.only('store', () => {
           .thenResolve(response)
         td.replace(api, 'get', get)
 
-        const options = {
-          getters: { rsql: '' },
-          expectedMutations: [{
-            type: SET_COLLECTION_IDS,
-            payload: [
-              { biobankId: 'b1', collectionId: 'c1' },
-              { biobankId: 'b2', collectionId: 'c2' }]
-          }]
-        }
+        const getters = { rsql: '' }
+        const commit = sinon.spy()
 
-        utils.testAction(actions[GET_COLLECTION_IDS], options, done)
+        actions.__GET_COLLECTION_IDS__({ commit, getters })
+
+        setTimeout(function () {
+          sinon.assert.calledWithMatch(commit.secondCall, SET_COLLECTION_IDS, [{ biobankId: 'b1', collectionId: 'c1' },
+            { biobankId: 'b2', collectionId: 'c2' }])
+          done()
+        }, 300)
       })
     })
 

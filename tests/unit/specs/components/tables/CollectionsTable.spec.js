@@ -1,3 +1,5 @@
+
+import { expect } from 'chai'
 import CollectionsTable from '@/components/tables/CollectionsTable'
 import { shallowMount } from '@vue/test-utils'
 

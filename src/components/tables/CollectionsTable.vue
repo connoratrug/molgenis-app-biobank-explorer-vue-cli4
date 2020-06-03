@@ -10,11 +10,11 @@
     </tr>
     </thead>
     <tbody>
-    <template v-for="collection in topLevelElements">
-      <tr>
+    <template v-for="collection in topLevelElements" >
+      <tr :key="collection">
         <td
           :class="{'table-text-content-columns-has-sub': hasSubCollections(collection), 'table-text-content-columns': !hasSubCollections(collection)}"
-          v-for="column in columns">
+          v-for="column in columns" :key="column">
               <span v-if="column === 'name'">
                 <router-link :to="'/collection/' + collection['id']">
                   <button class="btn btn-link">{{collection[column]}}</button>
@@ -29,7 +29,7 @@
           <span v-else-if="column === 'size'">{{ getCollectionSize(collection) }}</span>
         </td>
       </tr>
-      <tr v-if="hasSubCollections(collection)">
+      <tr v-if="hasSubCollections(collection)" :key="collection">
         <td colspan="5" class="sub-table-cell">
           <sub-collections-table :subCollections="collection.sub_collections"></sub-collections-table>
         </td>
@@ -94,7 +94,7 @@ export default {
       return utils.getUniqueIdArray(collection.type.map(type => type.label)).join(', ')
     },
     hasSubCollections (collection) {
-      return collection.sub_collections.length > 0
+      return collection && collection.sub_collections && collection.sub_collections.length > 0
     },
     getCollectionSize (collection) {
       return collection.size || collection.order_of_magnitude.size
